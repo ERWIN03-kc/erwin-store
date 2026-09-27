@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<meta name="theme-color" content="#100C18">
-<title>Admin</title>
+<meta name="theme-color" content="#050B12">
+<title>ERWIN STORE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -13,411 +12,548 @@
 </head>
 <body>
 
-<div class="login" id="loginView" hidden>
-  <h1>Login admin</h1>
-  <p class="hint">Masukkan password admin untuk mengelola toko.</p>
-  <label class="f" for="pw">Password</label>
-  <input class="in" id="pw" type="password" autocomplete="current-password">
-  <div class="err" id="loginErr" role="alert"></div>
-  <button class="btn block" id="loginBtn">Masuk</button>
+<!-- loading screen -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-mark" id="loaderMark">E</div>
+  <div class="loader-ring"></div>
+  <div class="loader-txt">Memuat toko...</div>
 </div>
 
-<div id="app" hidden>
-  <header class="topbar">
-    <div class="wrap">
-      <span class="brand" id="aBrand">Admin</span>
-      <div style="display:flex;gap:8px">
-        <a class="btn ghost sm" href="/" target="_blank" rel="noopener">Lihat toko</a>
-        <button class="btn ghost sm" id="logout">Keluar</button>
-      </div>
+<!-- popup kebijakan -->
+<div class="consent-overlay" id="consentOverlay" hidden>
+  <div class="consent-box">
+    <h2>Kebijakan Privasi &amp; Cookie</h2>
+    <div class="consent-text">
+      <p><b>Data yang kami simpan.</b> Saat kamu membuat pesanan, kami menyimpan nama produk, metode pembayaran, bukti transfer, dan data pengiriman (nama, nomor HP, email) yang kamu isi sendiri. Data ini dipakai hanya untuk memproses pesananmu.</p>
+      <p><b>Cookie &amp; penyimpanan lokal.</b> Situs ini menyimpan kode pesanan dan status persetujuan kebijakan ini di perangkatmu (local storage), bukan di server pihak ketiga, supaya kamu bisa cek pesanan kapan saja tanpa login.</p>
+      <p><b>Fitur tanya-jawab (chatbot).</b> Pertanyaan yang kamu kirim ke chatbot pojok kanan bawah diteruskan ke layanan AI pihak ketiga untuk dijawab. Jangan kirim data pribadi yang sensitif lewat chatbot.</p>
+      <p><b>Berbagi data.</b> Kami tidak menjual atau membagikan datamu ke pihak lain, kecuali yang memang diperlukan untuk memproses pesananmu atau bila diwajibkan oleh hukum.</p>
+      <p>Dengan menekan tombol di bawah, kamu menyetujui pemrosesan data sesuai penjelasan di atas.</p>
     </div>
-  </header>
-  <nav class="tabs" role="tablist" aria-label="Menu admin">
-    <button class="tab" role="tab" data-tab="orders" aria-selected="true">Pesanan <span class="badge" id="orderBadge" hidden>0</span></button>
-    <button class="tab" role="tab" data-tab="products" aria-selected="false">Produk</button>
-    <button class="tab" role="tab" data-tab="payments" aria-selected="false">Pembayaran</button>
-    <button class="tab" role="tab" data-tab="bugs" aria-selected="false">Laporan bug <span class="badge" id="bugBadge" hidden>0</span></button>
-    <button class="tab" role="tab" data-tab="settings" aria-selected="false">Pengaturan</button>
+    <label class="consent-check" for="consentCheck">
+      <input type="checkbox" id="consentCheck">
+      Saya sudah membaca dan memahami kebijakan di atas
+    </label>
+    <button class="btn block" id="consentBtn" disabled>Saya setuju dengan kebijakan</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="wrap">
+    <button class="icon-btn" id="menuBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="menu">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+    <a class="wordmark" id="brand" href="#top">ERWIN STORE</a>
+    <button class="btn ghost sm" id="trackBtn">Cek pesanan</button>
+  </div>
+</header>
+
+<!-- menu samping (garis 3) -->
+<div class="scrim" id="scrim"></div>
+<aside class="menu" id="menu" aria-label="Menu" aria-hidden="true">
+  <div class="menu-head">
+    <span class="wordmark" id="menuBrand">ERWIN STORE</span>
+    <button class="icon-btn" id="menuClose" aria-label="Tutup menu"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <nav>
+    <a href="#top" data-close>Beranda</a>
+    <a href="#produk" data-close>Produk</a>
+    <a href="#cara" data-close>Cara pesan</a>
+    <button id="menuTrack">Cek pesanan</button>
   </nav>
+  <h3>Hubungi kami</h3>
+  <div id="menuSocials"></div>
+  <div class="grow"></div>
+  <div class="bottom">
+    <button class="soc" id="menuBug">
+      <span class="ring"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+      <span><b>Laporkan bug</b><small>Ada yang error? Kabari admin</small></span>
+    </button>
+  </div>
+</aside>
 
-  <main class="wrap">
-    <!-- pesanan -->
-    <section class="panel" id="p-orders">
-      <div class="filters" id="filters"></div>
-      <div id="orderList"></div>
-    </section>
-
-    <!-- produk -->
-    <section class="panel" id="p-products" hidden>
-      <div class="box">
-        <h2 id="formTitle">Tambah produk</h2>
-        <label class="f" for="pName">Nama produk</label>
-        <input class="in" id="pName" maxlength="100">
-        <label class="f" for="pPrice">Harga (Rp)</label>
-        <input class="in" id="pPrice" inputmode="numeric" placeholder="25000">
-        <label class="f" for="pDesc">Deskripsi (opsional)</label>
-        <textarea class="in" id="pDesc" maxlength="500"></textarea>
-        <label class="f" for="pImage">Foto produk</label>
-        <input class="in" type="file" id="pImage" accept="image/*">
-        <img class="qr-prev" id="pPrev" alt="Pratinjau foto" hidden>
-        <div><button class="btn ghost sm" id="pRemoveImg" style="margin-top:8px" hidden>Hapus foto</button></div>
-        <label class="sw" style="margin-top:12px"><input type="checkbox" id="pActive" checked> Tampilkan di toko</label>
-        <div class="err" id="pErr"></div>
-        <div class="actions">
-          <button class="btn" id="pSave">Simpan produk</button>
-          <button class="btn ghost" id="pCancel" hidden>Batal edit</button>
+<main>
+  <section class="hero" id="top">
+    <div class="wrap hero-in">
+      <div>
+        <h1 id="heroTitle">ERWIN STORE</h1>
+        <p>Belanja mudah, bayar cepat, dan pesananmu langsung dikirim lewat web ini.</p>
+        <div class="hero-cta">
+          <a class="btn" href="#produk">Lihat produk</a>
+          <button class="btn ghost" id="heroTrack">Cek pesanan</button>
         </div>
       </div>
-      <div class="box" id="productList"></div>
-    </section>
+      <svg class="hero-mark" viewBox="0 0 200 200" aria-hidden="true">
+        <circle cx="100" cy="100" r="94" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="100" cy="100" r="84" fill="none" stroke="currentColor" stroke-width="1" opacity=".45"/>
+        <text id="markLetter" x="100" y="132" text-anchor="middle" font-size="108" fill="currentColor">E</text>
+      </svg>
+    </div>
+    <div class="wrap badge-row" aria-label="Keunggulan singkat">
+      <span class="badge-pill"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Transaksi aman</span>
+      <span class="badge-pill"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 11 14 9 22 21 10 13 10 13 2"/></svg>Proses cepat</span>
+      <span class="badge-pill"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15 9 22 9.5 16.5 14 18 21 12 17.3 6 21 7.5 14 2 9.5 9 9"/></svg>Rating memuaskan</span>
+      <span class="badge-pill"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9"/></svg>Pembeli terverifikasi</span>
+    </div>
+  </section>
 
-    <!-- pembayaran -->
-    <section class="panel" id="p-payments" hidden>
-      <p class="hint" style="margin-bottom:12px">Atur metode pembayaran yang tampil ke pembeli. Minimal satu metode harus aktif.</p>
-      <div class="pgrid" id="payGrid"></div>
-    </section>
+  <section class="wrap trust" aria-label="Keunggulan">
+    <div class="tr"><span class="ring"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+      <div><b>Bayar fleksibel</b><span class="t" id="trustPay">Pilih metode pembayaran yang kamu suka.</span></div></div>
+    <div class="tr"><span class="ring"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+      <div><b>Status jelas</b><span class="t">Pantau pesananmu kapan saja pakai kode pesanan.</span></div></div>
+    <div class="tr"><span class="ring"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+      <div><b>Dicek admin</b><span class="t">Setiap pembayaran dikonfirmasi langsung oleh admin.</span></div></div>
+  </section>
 
-    <!-- laporan bug -->
-    <section class="panel" id="p-bugs" hidden>
-      <div id="bugList"></div>
-    </section>
+  <section class="wrap" id="produk">
+    <h2 class="section-title">Produk pilihan</h2>
+    <div class="grid" id="grid"><p class="empty">Memuat produk...</p></div>
+  </section>
 
-    <!-- pengaturan -->
-    <section class="panel" id="p-settings" hidden>
-      <div class="box">
-        <h2>Nama toko</h2>
-        <input class="in" id="sName" maxlength="60">
-        <p class="hint" style="margin-top:6px">Tersimpan bersama tombol "Simpan pengaturan" di bawah.</p>
+  <section class="wrap" id="cara">
+    <h2 class="section-title">Cara pesan</h2>
+    <ol class="how">
+      <li><div class="n">1</div><b>Pilih produk</b><span>Tekan Beli pada produk yang kamu mau.</span></li>
+      <li><div class="n">2</div><b>Bayar</b><span>Scan QRIS atau transfer e-wallet sesuai nominal.</span></li>
+      <li><div class="n">3</div><b>Kirim bukti</b><span>Upload screenshot bukti transfer.</span></li>
+      <li><div class="n">4</div><b>Terima pesanan</b><span>Setelah dikonfirmasi, isi data dan pesanan dikirim lewat web.</span></li>
+    </ol>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-in">
+      <div>
+        <span class="wordmark" id="fBrand">ERWIN STORE</span>
+        <p class="hint" style="margin-top:6px">Belanja mudah dan aman.</p>
       </div>
-      <div class="box">
-        <h2>Kontak &amp; sosial media</h2>
-        <p class="hint">Tampil di menu (garis 3) dan footer web pembeli. Kosongkan kalau tidak dipakai.</p>
-        <label class="f" for="sIg">Instagram (username)</label>
-        <input class="in" id="sIg" placeholder="erwinstore" maxlength="120" autocapitalize="off">
-        <label class="f" for="sTg">Telegram (username)</label>
-        <input class="in" id="sTg" placeholder="erwinstore" maxlength="120" autocapitalize="off">
-        <label class="f" for="sWa">WhatsApp (nomor)</label>
-        <input class="in" id="sWa" placeholder="081234567890" inputmode="tel" maxlength="30">
-        <div class="err" id="sErr"></div>
-        <div class="actions"><button class="btn" id="sSave">Simpan pengaturan</button></div>
+      <div class="soc-row" id="fSocials"></div>
+      <div class="foot-links">
+        <button class="linkbtn" id="fTrack">Cek pesanan</button>
+        <button class="linkbtn" id="fBug">Laporkan bug</button>
       </div>
-      <div class="box">
-        <h2>Password admin</h2>
-        <p class="hint">Password diatur lewat variabel <b>ADMIN_PASSWORD</b> saat server dijalankan. Ubah di sana, lalu restart server.</p>
-      </div>
-      <div class="box">
-        <h2>Chatbot tanya-jawab</h2>
-        <p class="hint">Widget chat di pojok kanan bawah web pembeli dijawab otomatis pakai AI Groq, berdasarkan daftar produk yang aktif. Aktifkan dengan mengisi variabel <b>GROQ_API_KEY</b> saat menjalankan server (ambil kunci gratis di console.groq.com), lalu restart server. Kalau belum diisi, chatbot akan menampilkan pesan bahwa fitur belum aktif.</p>
-      </div>
-    </section>
-  </main>
+    </div>
+    <p class="copy">&copy; <span id="yr"></span> <span id="fBrand2">ERWIN STORE</span>. Semua hak dilindungi.</p>
+    <p class="foot-credit">Website ini dikembangkan oleh <b>Wine</b>.</p>
+  </div>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="x" id="mClose" aria-label="Tutup">&times;</button>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<!-- chatbot -->
+<button class="chat-fab" id="chatFab" aria-label="Tanya-tanya soal produk">
+  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div><b id="chatBrand">Tanya toko</b><small>Tanya soal produk yang dijual</small></div>
+    <button class="icon-btn" id="chatClose" aria-label="Tutup chat" style="width:34px;height:34px;border-width:1px">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-foot">
+    <input id="chatInput" placeholder="Tulis pertanyaan..." autocomplete="off" maxlength="500">
+    <button id="chatSend">Kirim</button>
+  </div>
 </div>
 
 <script src="/common.js"></script>
 <script>
-let D = { settings: {}, products: [], payments: [], orders: [] };
-let filter = 'all', pollTimer = null, lastSnap = '';
-const openSet = new Set();
+let shop = { products: [], payments: [], storeName: 'ERWIN STORE', socials: {} };
+let currentCode = null, lastStatus = null, pollTimer = null;
+const modal = $('#modal'), mBody = $('#mBody');
 
-/* ---------- login ---------- */
-function showLogin() {
-  clearInterval(pollTimer);
-  localStorage.removeItem('adminToken');
-  $('#app').hidden = true; $('#loginView').hidden = false;
-}
-async function start() {
-  try {
-    await load();
-    $('#loginView').hidden = true; $('#app').hidden = false;
-    clearInterval(pollTimer);
-    pollTimer = setInterval(poll, 10000);
-  } catch (e) { showLogin(); }
-}
-$('#loginBtn').onclick = async () => {
-  $('#loginErr').textContent = '';
-  try {
-    const { token } = await api('/api/admin/login', { method: 'POST', body: { password: $('#pw').value } });
-    localStorage.setItem('adminToken', token);
-    $('#pw').value = '';
-    start();
-  } catch (e) { $('#loginErr').textContent = e.message; }
+const thumb = (img, name) => img
+  ? `<img src="${esc(img)}" alt="${esc(name)}" loading="lazy">`
+  : `<span class="ph">${esc((name || '?').trim().charAt(0).toUpperCase())}</span>`;
+
+/* ---------- ikon sosmed ---------- */
+const svg = inner => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+const ICON = {
+  instagram: svg('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>'),
+  telegram: svg('<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>'),
+  whatsapp: svg('<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.6-1.9-1-.8.6a3.6 3.6 0 0 1-1.6-1.6l.6-.8-1-1.9z" fill="currentColor" stroke="none"/>')
 };
-$('#pw').onkeydown = e => { if (e.key === 'Enter') $('#loginBtn').click(); };
-$('#logout').onclick = showLogin;
-
-async function load() {
-  D = await api('/api/admin/data', { admin: true });
-  lastSnap = JSON.stringify([D.orders, D.bugs]);
-  $('#aBrand').textContent = D.settings.storeName;
-  document.title = 'Admin ' + D.settings.storeName;
-  $('#sName').value = D.settings.storeName;
-  const so = D.settings.socials || {};
-  $('#sIg').value = so.instagram || ''; $('#sTg').value = so.telegram || ''; $('#sWa').value = so.whatsapp || '';
-  renderOrders(); renderProducts(); renderPayments(); renderBugs();
+function socialList(s) {
+  const out = [];
+  if (s.instagram) out.push({ k: 'instagram', name: 'Instagram', url: 'https://instagram.com/' + encodeURIComponent(s.instagram), label: '@' + s.instagram });
+  if (s.telegram) out.push({ k: 'telegram', name: 'Telegram', url: 'https://t.me/' + encodeURIComponent(s.telegram), label: '@' + s.telegram });
+  if (s.whatsapp) out.push({ k: 'whatsapp', name: 'WhatsApp', url: 'https://wa.me/' + encodeURIComponent(s.whatsapp), label: '+' + s.whatsapp });
+  return out;
 }
-async function poll() {
-  if (document.hidden) return;
-  const ae = document.activeElement;
-  if (ae && $('#p-orders').contains(ae) && /^(TEXTAREA|INPUT)$/.test(ae.tagName)) return; // jangan ganggu yang lagi ngetik
+
+/* ---------- daftar produk & tampilan toko ---------- */
+async function loadShop() {
   try {
-    const d = await api('/api/admin/data', { admin: true });
-    const snap = JSON.stringify([d.orders, d.bugs]);
-    if (snap !== lastSnap) { D.orders = d.orders; D.bugs = d.bugs; lastSnap = snap; renderOrders(); renderBugs(); }
-  } catch (e) { if (e.status === 401) showLogin(); }
-}
-async function guard(fn) {
-  try { await fn(); }
-  catch (e) { if (e.status === 401) showLogin(); else toast(e.message); }
-}
+    shop = await api('/api/shop');
+  } catch (e) {
+    $('#grid').innerHTML = `<p class="empty">Produk gagal dimuat. Coba muat ulang halaman.</p>`;
+    return;
+  }
+  const name = shop.storeName;
+  document.title = name;
+  ['brand', 'menuBrand', 'heroTitle', 'fBrand', 'fBrand2'].forEach(id => $('#' + id).textContent = name);
+  $('#markLetter').textContent = name.trim().charAt(0).toUpperCase();
+  $('#loaderMark').textContent = name.trim().charAt(0).toUpperCase();
+  $('#chatBrand').textContent = 'Tanya ' + name;
+  $('#yr').textContent = new Date().getFullYear();
+  if (shop.payments.length) $('#trustPay').textContent = 'Bayar pakai ' + shop.payments.map(p => p.name).join(', ') + '.';
 
-/* ---------- tab ---------- */
-$$('.tab').forEach(t => t.onclick = () => {
-  $$('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
-  ['orders', 'products', 'payments', 'bugs', 'settings'].forEach(n => $('#p-' + n).hidden = n !== t.dataset.tab);
+  const soc = socialList(shop.socials || {});
+  $('#menuSocials').innerHTML = soc.length ? soc.map(s => `
+    <a class="soc" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">
+      <span class="ring">${ICON[s.k]}</span><span><b>${s.name}</b><small>${esc(s.label)}</small></span></a>`).join('')
+    : `<p class="hint" style="padding:6px 20px">Kontak belum diatur oleh admin.</p>`;
+  $('#fSocials').innerHTML = soc.map(s => `<a class="soc-round" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer" aria-label="${s.name}">${ICON[s.k]}</a>`).join('');
+
+  $('#grid').innerHTML = shop.products.length ? shop.products.map(p => `
+    <article class="card">
+      <div class="pic">${thumb(p.image, p.name)}</div>
+      <div class="body">
+        <h3>${esc(p.name)}</h3>
+        <p class="desc">${esc(p.description)}</p>
+        <div class="price">${rupiah(p.price)}</div>
+        <button class="btn block" data-buy="${esc(p.id)}">Beli</button>
+      </div>
+    </article>`).join('') : `<p class="empty">Belum ada produk yang dijual.</p>`;
+}
+$('#grid').addEventListener('click', e => {
+  const b = e.target.closest('[data-buy]');
+  if (b) openBuy(b.dataset.buy);
 });
 
-/* ---------- pesanan ---------- */
-const LABEL = { menunggu_bukti: 'Belum bayar', menunggu_konfirmasi: 'Perlu dicek', ditolak: 'Ditolak', dibayar: 'Lunas, tunggu data', data_terisi: 'Perlu dikirim', selesai: 'Selesai' };
-const GROUPS = {
-  all: () => true,
-  cek: o => o.status === 'menunggu_konfirmasi',
-  kirim: o => ['dibayar', 'data_terisi'].includes(o.status),
-  selesai: o => o.status === 'selesai',
-  lain: o => ['menunggu_bukti', 'ditolak'].includes(o.status)
-};
-const GROUP_NAME = { all: 'Semua', cek: 'Perlu dicek', kirim: 'Perlu dikirim', selesai: 'Selesai', lain: 'Belum bayar / ditolak' };
+/* ---------- menu garis 3 ---------- */
+const menu = $('#menu'), scrim = $('#scrim');
+function setMenu(open) {
+  menu.classList.toggle('open', open);
+  scrim.classList.toggle('open', open);
+  menu.setAttribute('aria-hidden', !open);
+  $('#menuBtn').setAttribute('aria-expanded', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  if (open) $('#menuClose').focus();
+}
+$('#menuBtn').onclick = () => setMenu(true);
+$('#menuClose').onclick = scrim.onclick = () => setMenu(false);
+$$('[data-close]', menu).forEach(a => a.addEventListener('click', () => setMenu(false)));
+$('#menuTrack').onclick = () => { setMenu(false); openTrack(); };
+$('#menuBug').onclick = () => { setMenu(false); openBug(); };
+$('#heroTrack').onclick = $('#fTrack').onclick = () => openTrack();
+$('#fBug').onclick = () => openBug();
 
-function waLink(phone) {
-  let n = String(phone).replace(/\D/g, '');
-  if (n.startsWith('0')) n = '62' + n.slice(1);
-  return 'https://wa.me/' + n;
+/* ---------- modal ---------- */
+function show(html) {
+  mBody.innerHTML = html;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('.sheet').scrollTop = 0;
+  $$('[data-copy]', mBody).forEach(b => b.onclick = () => copyText(b.dataset.copy));
+}
+function closeModal() {
+  modal.hidden = true;
+  document.body.style.overflow = '';
+  clearInterval(pollTimer);
+  currentCode = null;
+  if (location.hash.startsWith('#INV-')) history.replaceState(null, '', location.pathname);
+}
+function freshModal() { clearInterval(pollTimer); currentCode = null; }
+$('#mClose').onclick = closeModal;
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+$('#trackBtn').onclick = () => openTrack();
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!modal.hidden) closeModal(); else if (menu.classList.contains('open')) setMenu(false);
+});
+
+/* ---------- riwayat kode pesanan (di browser pembeli) ---------- */
+const recent = () => { try { return JSON.parse(localStorage.getItem('orders') || '[]'); } catch { return []; } };
+function remember(code) {
+  const list = [code, ...recent().filter(c => c !== code)].slice(0, 10);
+  localStorage.setItem('orders', JSON.stringify(list));
+}
+
+/* ---------- laporkan bug ---------- */
+function openBug() {
+  freshModal();
+  show(`
+    <h2 id="mTitle">Laporkan bug</h2>
+    <p class="hint">Ceritakan kendala yang kamu temui. Laporan langsung masuk ke admin.</p>
+    <label class="f" for="bMsg">Apa yang terjadi?</label>
+    <textarea class="in" id="bMsg" rows="4" maxlength="1000" placeholder="Contoh: tombol Beli tidak bisa ditekan"></textarea>
+    <label class="f" for="bContact">Kontak (opsional)</label>
+    <input class="in" id="bContact" maxlength="100" placeholder="WhatsApp / Telegram / email, supaya admin bisa membalas">
+    <label class="f" for="bImg">Screenshot (opsional)</label>
+    <input class="in" type="file" id="bImg" accept="image/*">
+    <div class="err" id="err"></div>
+    <button class="btn block" id="bSend">Kirim laporan</button>`);
+  let img = null;
+  $('#bImg').onchange = async () => {
+    $('#err').textContent = ''; img = null;
+    try { img = await fileToDataUrl($('#bImg').files[0], { max: 1200 }); }
+    catch (e) { $('#err').textContent = e.message; }
+  };
+  $('#bSend').onclick = async e => {
+    e.target.disabled = true; $('#err').textContent = '';
+    try {
+      await api('/api/bugs', { method: 'POST', body: { message: $('#bMsg').value, contact: $('#bContact').value, image: img, page: location.pathname } });
+      show(`<h2 id="mTitle">Laporan terkirim</h2>
+        <div class="alert ok">Terima kasih! Laporanmu sudah masuk ke admin.</div>
+        <button class="btn block" id="okBtn">Tutup</button>`);
+      $('#okBtn').onclick = closeModal;
+    } catch (ex) { $('#err').textContent = ex.message; e.target.disabled = false; }
+  };
+}
+
+/* ---------- langkah 1: pilih pembayaran ---------- */
+function openBuy(id) {
+  const p = shop.products.find(x => x.id === id);
+  if (!p) return;
+  if (!shop.payments.length) return toast('Metode pembayaran belum tersedia');
+  freshModal();
+  show(`
+    <h2 id="mTitle">Pilih pembayaran</h2>
+    <div class="sum"><div class="thumb">${thumb(p.image, p.name)}</div>
+      <div><b>${esc(p.name)}</b><div class="price" style="margin:0">${rupiah(p.price)}</div></div></div>
+    <div class="pay-list">${shop.payments.map((pm, i) => `
+      <label class="pay"><input type="radio" name="pay" value="${esc(pm.id)}" ${i === 0 ? 'checked' : ''}>${esc(pm.name)}</label>`).join('')}
+    </div>
+    <div class="err" id="err"></div>
+    <button class="btn block" id="go">Lanjut bayar</button>`);
+  $('#go').onclick = async e => {
+    e.target.disabled = true;
+    try {
+      const { code } = await api('/api/orders', { method: 'POST', body: { productId: p.id, paymentId: $('input[name=pay]:checked').value } });
+      remember(code);
+      openOrder(code);
+    } catch (err) {
+      $('#err').textContent = err.message;
+      e.target.disabled = false;
+    }
+  };
+}
+
+/* ---------- cek pesanan ---------- */
+function openTrack() {
+  freshModal();
+  const rec = recent();
+  show(`
+    <h2 id="mTitle">Cek pesanan</h2>
+    <label class="f" for="tc">Kode pesanan</label>
+    <input class="in" id="tc" placeholder="INV-XXXXXXXXXX" autocomplete="off">
+    <div class="err" id="err"></div>
+    <button class="btn block" id="tg">Buka pesanan</button>
+    ${rec.length ? `<h3 style="font-size:.95rem;margin:20px 0 8px">Pesanan terakhir di perangkat ini</h3>
+      <div class="pay-list">${rec.map(c => `<button class="btn ghost" data-open="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}`);
+  const go = () => {
+    const c = $('#tc').value.trim().toUpperCase();
+    if (!/^INV-[A-Z0-9]+$/.test(c)) return $('#err').textContent = 'Format kode salah. Contoh: INV-AB12CD34EF';
+    remember(c); openOrder(c);
+  };
+  $('#tg').onclick = go;
+  $('#tc').onkeydown = e => { if (e.key === 'Enter') go(); };
+  $$('[data-open]', mBody).forEach(b => b.onclick = () => openOrder(b.dataset.open));
+}
+
+/* ---------- halaman pesanan (berubah sesuai status) ---------- */
+const STEPS = ['Bayar', 'Dicek', 'Isi data', 'Selesai'];
+const STEP_OF = { menunggu_bukti: 0, ditolak: 0, menunggu_konfirmasi: 1, dibayar: 2, data_terisi: 3, selesai: 4 };
+
+async function openOrder(code) {
+  currentCode = code;
+  lastStatus = null;
+  clearInterval(pollTimer);
+  history.replaceState(null, '', '#' + code);
+  await refreshOrder(true);
+  if (currentCode === code) pollTimer = setInterval(() => refreshOrder(false), 5000);
+}
+
+async function refreshOrder(force) {
+  const code = currentCode;
+  if (!code) return;
+  if (!force && !['menunggu_konfirmasi', 'data_terisi'].includes(lastStatus)) return;
+  try {
+    const o = await api('/api/orders/' + code);
+    if (code !== currentCode) return;
+    if (force || o.status !== lastStatus) {
+      lastStatus = o.status;
+      show(orderHtml(o));
+      bindOrder(o);
+    }
+  } catch (e) {
+    if (force && code === currentCode) {
+      clearInterval(pollTimer);
+      currentCode = null;
+      show(`<h2 id="mTitle">Pesanan tidak ditemukan</h2><p class="hint">${esc(e.message)}</p>`);
+    }
+  }
+}
+
+function receiptHtml(o) {
+  return `<div class="receipt"><h3>Pembayaran diterima</h3><dl>
+    <dt>No. pesanan</dt><dd>${esc(o.code)}</dd>
+    <dt>Produk</dt><dd>${esc(o.product.name)}</dd>
+    <dt>Nominal</dt><dd>${rupiah(o.product.price)}</dd>
+    <dt>Metode</dt><dd>${esc(o.payment.name)}</dd>
+    <dt>Tanggal bayar</dt><dd>${tanggal(o.paidAt)}</dd></dl></div>`;
 }
 
 function orderHtml(o) {
-  const d = o.details;
-  return `<details class="order" data-code="${o.code}" ${openSet.has(o.code) ? 'open' : ''}>
-    <summary>
-      <div><div class="ot">${esc(o.product.name)} &middot; ${rupiah(o.product.price)}</div>
-        <div class="os">${o.code} &middot; ${esc(o.payment.name)} &middot; ${tanggal(o.createdAt)}</div></div>
-      <span class="st ${o.status}">${LABEL[o.status]}</span>
-    </summary>
-    <div class="od">
-      ${o.proof ? `<h4>Bukti transfer</h4><a href="${esc(o.proof)}" target="_blank" rel="noopener"><img class="proof" src="${esc(o.proof)}" alt="Bukti transfer"></a>` : ''}
-      ${o.status === 'ditolak' ? `<div class="alert bad" style="margin-top:12px">Alasan penolakan: ${esc(o.rejectReason)}</div>` : ''}
-      ${d ? `<h4>Data pembeli</h4><dl class="kv">
+  const idx = STEP_OF[o.status], pm = o.payment, d = o.details;
+  let body = '';
+
+  if (o.status === 'menunggu_bukti' || o.status === 'ditolak') {
+    body = `
+      ${o.status === 'ditolak' ? `<div class="alert bad"><b>Pembayaran ditolak.</b> ${esc(o.rejectReason)} Kirim ulang bukti transfer yang benar.</div>` : ''}
+      <div class="amount"><small>Total pembayaran</small><b>${rupiah(o.product.price)}</b></div>
+      <div class="payinfo"><b>${esc(pm.name)}</b>
+        ${pm.image ? `<img src="${esc(pm.image)}" alt="Kode pembayaran ${esc(pm.name)}" style="margin-top:10px">` : ''}
+        ${pm.number ? `<div class="copyrow" style="margin-top:8px"><b>${esc(pm.number)}</b><button class="btn ghost sm" data-copy="${esc(pm.number)}">Salin</button></div>` : ''}
+        ${pm.holder ? `<div class="hint">a.n. ${esc(pm.holder)}</div>` : ''}
+        ${pm.note ? `<div class="hint">${esc(pm.note)}</div>` : ''}
+        ${!pm.image && !pm.number ? `<div class="hint">Info pembayaran belum diisi. Hubungi admin.</div>` : ''}
+      </div>
+      <label class="f" for="proof">Upload bukti transfer (screenshot)</label>
+      <input class="in" type="file" id="proof" accept="image/*">
+      <img class="proof-prev" id="prev" alt="Pratinjau bukti" hidden>
+      <div class="err" id="err"></div>
+      <button class="btn block" id="sendProof" disabled>Kirim bukti transfer</button>`;
+  } else if (o.status === 'menunggu_konfirmasi') {
+    body = `
+      <div class="wait"><div class="spin"></div><b>Bukti transfer terkirim</b>
+        <p class="hint">Admin sedang mengecek pembayaranmu. Halaman ini berubah otomatis setelah dikonfirmasi.</p></div>
+      ${o.proof ? `<img class="proof-prev" src="${esc(o.proof)}" alt="Bukti transfer">` : ''}`;
+  } else if (o.status === 'dibayar') {
+    body = `${receiptHtml(o)}
+      <h3 style="font-size:1rem">Lengkapi data pesanan</h3>
+      <label class="f" for="d_name">Nama</label><input class="in" id="d_name" autocomplete="name">
+      <label class="f" for="d_item">Nama barang yang dibeli</label><input class="in" id="d_item" value="${esc(o.product.name)}">
+      <label class="f" for="d_phone">Nomor HP / WhatsApp</label><input class="in" id="d_phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx">
+      <label class="f" for="d_email">Email</label><input class="in" id="d_email" type="email" autocomplete="email">
+      <label class="f" for="d_note">Catatan (opsional)</label><textarea class="in" id="d_note"></textarea>
+      <div class="err" id="err"></div>
+      <button class="btn block" id="sendDetails">Kirim data</button>`;
+  } else if (o.status === 'data_terisi') {
+    body = `${receiptHtml(o)}
+      <div class="wait"><div class="spin"></div><b>Data sudah diterima</b>
+        <p class="hint">Admin sedang menyiapkan pesananmu. Halaman ini berubah otomatis saat pesanan dikirim.</p></div>
+      <div class="receipt" style="border-style:solid;border-color:var(--line)"><dl>
         <dt>Nama</dt><dd>${esc(d.name)}</dd>
         <dt>Barang</dt><dd>${esc(d.item)}</dd>
-        <dt>No. HP</dt><dd>${esc(d.phone)} (<a href="${esc(waLink(d.phone))}" target="_blank" rel="noopener">chat WhatsApp</a>)</dd>
-        <dt>Email</dt><dd><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></dd>
-        ${d.note ? `<dt>Catatan</dt><dd>${esc(d.note)}</dd>` : ''}</dl>` : ''}
-      ${o.status === 'menunggu_konfirmasi' ? `<div class="actions">
-        <button class="btn ok" data-act="approve" data-code="${o.code}">ACC pembayaran</button>
-        <button class="btn bad" data-act="reject" data-code="${o.code}">Tolak</button></div>` : ''}
-      ${['dibayar', 'data_terisi'].includes(o.status) ? `
-        <h4>Kirim pesanan ke pembeli</h4>
-        <textarea class="in" id="msg-${o.code}" rows="4" placeholder="Isi pesanan: kode, link download, akun, atau keterangan lain"></textarea>
-        <div class="actions"><button class="btn" data-act="deliver" data-code="${o.code}">Kirim pesanan</button></div>` : ''}
-      ${o.status === 'selesai' && o.delivery ? `<h4>Pesan yang dikirim (${tanggal(o.delivery.at)})</h4><div class="delivery">${linkify(o.delivery.message)}</div>` : ''}
-    </div></details>`;
-}
-
-function renderOrders() {
-  const count = k => D.orders.filter(GROUPS[k]).length;
-  $('#filters').innerHTML = Object.keys(GROUPS).map(k =>
-    `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${GROUP_NAME[k]} (${count(k)})</button>`).join('');
-  const list = D.orders.filter(GROUPS[filter]);
-  $('#orderList').innerHTML = list.length ? list.map(orderHtml).join('') : `<p class="hint" style="text-align:center;padding:32px 0">Belum ada pesanan di kategori ini.</p>`;
-  const need = count('cek');
-  $('#orderBadge').hidden = !need;
-  $('#orderBadge').textContent = need;
-}
-$('#filters').addEventListener('click', e => {
-  const c = e.target.closest('[data-f]');
-  if (c) { filter = c.dataset.f; renderOrders(); }
-});
-$('#orderList').addEventListener('toggle', e => {
-  const code = e.target.dataset && e.target.dataset.code;
-  if (!code) return;
-  e.target.open ? openSet.add(code) : openSet.delete(code);
-}, true);
-$('#orderList').addEventListener('click', e => {
-  const b = e.target.closest('[data-act]');
-  if (!b) return;
-  const { act, code } = b.dataset;
-  const run = (path, body) => guard(async () => {
-    await api(`/api/admin/orders/${code}/${path}`, { method: 'POST', admin: true, body: body || {} });
-    await load(); toast('Berhasil');
-  });
-  if (act === 'approve') { if (confirm('Pastikan dana sudah masuk. ACC pembayaran ini?')) run('approve'); }
-  if (act === 'reject') { const r = prompt('Alasan penolakan (opsional):'); if (r !== null) run('reject', { reason: r }); }
-  if (act === 'deliver') {
-    const t = document.getElementById('msg-' + code).value.trim();
-    if (!t) return toast('Isi pesan pengiriman dulu');
-    run('deliver', { message: t });
+        <dt>No. HP</dt><dd>${esc(d.phone)}</dd>
+        <dt>Email</dt><dd>${esc(d.email)}</dd></dl></div>`;
+  } else if (o.status === 'selesai') {
+    body = `${receiptHtml(o)}
+      <div class="alert ok"><b>Pesananmu sudah dikirim.</b></div>
+      <div class="delivery">${linkify(o.delivery.message)}</div>
+      <p class="hint" style="margin-top:8px">Dikirim ${tanggal(o.delivery.at)}</p>`;
   }
-});
 
-/* ---------- produk ---------- */
-let editingId = null, pImg = null, pRemove = false;
-const thumb = (img, name) => img ? `<img src="${esc(img)}" alt="">` : `<span class="ph" style="font-size:1.4rem">${esc((name || '?').charAt(0).toUpperCase())}</span>`;
-
-function resetForm() {
-  editingId = null; pImg = null; pRemove = false;
-  $('#formTitle').textContent = 'Tambah produk';
-  ['pName', 'pPrice', 'pDesc'].forEach(i => $('#' + i).value = '');
-  $('#pImage').value = ''; $('#pPrev').hidden = true; $('#pRemoveImg').hidden = true;
-  $('#pActive').checked = true; $('#pCancel').hidden = true; $('#pErr').textContent = '';
+  return `<h2 id="mTitle">${esc(o.product.name)}</h2>
+    <div class="hint" style="margin:-6px 0 12px">Kode pesanan <b>${esc(o.code)}</b></div>
+    <div class="steps">${STEPS.map((s, i) => `<span class="${i < idx ? 'done' : i === idx ? 'on' : ''}">${s}</span>`).join('')}</div>
+    ${body}`;
 }
-$('#pImage').onchange = async () => {
-  try {
-    pImg = await fileToDataUrl($('#pImage').files[0], { max: 1000 });
-    pRemove = false;
-    $('#pPrev').src = pImg; $('#pPrev').hidden = false; $('#pRemoveImg').hidden = false;
-  } catch (e) { $('#pErr').textContent = e.message; }
+
+function bindOrder(o) {
+  if (o.status === 'menunggu_bukti' || o.status === 'ditolak') {
+    let proofImg = null;
+    $('#proof').onchange = async () => {
+      $('#err').textContent = ''; proofImg = null; $('#sendProof').disabled = true;
+      try {
+        proofImg = await fileToDataUrl($('#proof').files[0], { max: 1400 });
+        $('#prev').src = proofImg; $('#prev').hidden = false;
+        $('#sendProof').disabled = false;
+      } catch (e) { $('#err').textContent = e.message; }
+    };
+    $('#sendProof').onclick = async e => {
+      e.target.disabled = true; $('#err').textContent = '';
+      try {
+        const o2 = await api('/api/orders/' + o.code + '/proof', { method: 'POST', body: { image: proofImg } });
+        lastStatus = o2.status;
+        show(orderHtml(o2)); bindOrder(o2);
+        if (!pollTimer) pollTimer = setInterval(() => refreshOrder(false), 5000);
+      } catch (ex) { $('#err').textContent = ex.message; e.target.disabled = false; }
+    };
+  } else if (o.status === 'dibayar') {
+    $('#sendDetails').onclick = async e => {
+      e.target.disabled = true; $('#err').textContent = '';
+      const body = { name: $('#d_name').value, item: $('#d_item').value, phone: $('#d_phone').value, email: $('#d_email').value, note: $('#d_note').value };
+      try {
+        const o2 = await api('/api/orders/' + o.code + '/details', { method: 'POST', body });
+        lastStatus = o2.status;
+        show(orderHtml(o2)); bindOrder(o2);
+      } catch (ex) { $('#err').textContent = ex.message; e.target.disabled = false; }
+    };
+  }
+}
+
+/* ---------- popup kebijakan ---------- */
+const CONSENT_KEY = 'policyConsent_v1';
+const consentOverlay = $('#consentOverlay');
+if (!localStorage.getItem(CONSENT_KEY)) consentOverlay.hidden = false;
+$('#consentCheck').onchange = e => { $('#consentBtn').disabled = !e.target.checked; };
+$('#consentBtn').onclick = () => {
+  try { localStorage.setItem(CONSENT_KEY, '1'); } catch {}
+  consentOverlay.hidden = true;
 };
-$('#pRemoveImg').onclick = () => { pImg = null; pRemove = true; $('#pImage').value = ''; $('#pPrev').hidden = true; $('#pRemoveImg').hidden = true; };
-$('#pCancel').onclick = resetForm;
-$('#pSave').onclick = () => guard(async () => {
-  $('#pErr').textContent = '';
-  const body = {
-    name: $('#pName').value, price: Number($('#pPrice').value.replace(/\D/g, '')),
-    description: $('#pDesc').value, active: $('#pActive').checked
-  };
-  if (pImg) body.image = pImg;
-  if (pRemove) body.removeImage = true;
-  try {
-    await api(editingId ? '/api/admin/products/' + editingId : '/api/admin/products', { method: editingId ? 'PUT' : 'POST', admin: true, body });
-  } catch (e) { if (e.status === 401) throw e; $('#pErr').textContent = e.message; return; }
-  resetForm(); await load(); toast('Produk disimpan');
-});
 
-function renderProducts() {
-  $('#productList').innerHTML = `<h2>Daftar produk (${D.products.length})</h2>` + (D.products.length ? D.products.map(p => `
-    <div class="prow">
-      <div class="thumb">${thumb(p.image, p.name)}</div>
-      <div class="grow"><b>${esc(p.name)}</b><span class="os">${rupiah(p.price)}</span></div>
-      <label class="sw"><input type="checkbox" data-toggle="${p.id}" ${p.active ? 'checked' : ''}>Tampil</label>
-      <button class="btn ghost sm" data-edit="${p.id}">Edit</button>
-      <button class="btn bad sm" data-del="${p.id}">Hapus</button>
-    </div>`).join('') : `<p class="hint">Belum ada produk.</p>`);
+/* ---------- chatbot ---------- */
+let chatHistory = [];
+const chatPanel = $('#chatPanel'), chatBody = $('#chatBody');
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+  div.textContent = text;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
 }
-$('#productList').addEventListener('change', e => {
-  const id = e.target.dataset.toggle;
-  if (id) guard(async () => { await api('/api/admin/products/' + id, { method: 'PUT', admin: true, body: { active: e.target.checked } }); await load(); });
-});
-$('#productList').addEventListener('click', e => {
-  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
-  if (ed) {
-    const p = D.products.find(x => x.id === ed.dataset.edit);
-    resetForm(); editingId = p.id;
-    $('#formTitle').textContent = 'Edit produk';
-    $('#pName').value = p.name; $('#pPrice').value = p.price; $('#pDesc').value = p.description || '';
-    $('#pActive').checked = p.active; $('#pCancel').hidden = false;
-    if (p.image) { $('#pPrev').src = p.image; $('#pPrev').hidden = false; $('#pRemoveImg').hidden = false; }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+$('#chatFab').onclick = () => {
+  const open = chatPanel.classList.toggle('open');
+  if (open && !chatBody.children.length) {
+    addMsg('bot', `Halo! Aku asisten ${shop.storeName || 'toko ini'}. Tanya-tanya soal produk, harga, atau cara pesan ya.`);
   }
-  if (del) {
-    const p = D.products.find(x => x.id === del.dataset.del);
-    if (confirm(`Hapus produk "${p.name}"? Pesanan lama tetap tersimpan.`)) guard(async () => {
-      await api('/api/admin/products/' + p.id, { method: 'DELETE', admin: true });
-      if (editingId === p.id) resetForm();
-      await load(); toast('Produk dihapus');
-    });
+};
+$('#chatClose').onclick = () => chatPanel.classList.remove('open');
+async function sendChat() {
+  const input = $('#chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  const thinking = document.createElement('div');
+  thinking.className = 'msg bot think';
+  thinking.textContent = 'Mengetik...';
+  chatBody.appendChild(thinking);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  $('#chatSend').disabled = true;
+  try {
+    const { reply } = await api('/api/chat', { method: 'POST', body: { messages: chatHistory.slice(-10) } });
+    thinking.remove();
+    addMsg('bot', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    thinking.remove();
+    addMsg('bot', e.message || 'Maaf, chatbot lagi gangguan. Coba lagi nanti.');
   }
-});
-
-/* ---------- pembayaran ---------- */
-const payImg = {}, payRemove = {};
-function renderPayments() {
-  $('#payGrid').innerHTML = D.payments.map(p => `
-    <div class="box" data-pay="${p.id}">
-      <h2>${esc(p.name)}</h2>
-      <label class="sw"><input type="checkbox" data-f="enabled" ${p.enabled ? 'checked' : ''}> Aktif</label>
-      <label class="f">Atas nama</label>
-      <input class="in" data-f="holder" value="${esc(p.holder)}" maxlength="80">
-      ${p.id !== 'qris' ? `<label class="f">Nomor ${esc(p.name)}</label>
-      <input class="in" data-f="number" value="${esc(p.number)}" inputmode="tel" maxlength="40">` : ''}
-      <label class="f">${p.id === 'qris' ? 'Gambar QRIS' : 'Gambar QR (opsional)'}</label>
-      <input class="in" type="file" data-f="image" accept="image/*">
-      <img class="qr-prev" data-f="prev" ${p.image ? `src="${esc(p.image)}"` : 'hidden'} alt="QR ${esc(p.name)}">
-      <label class="f">Petunjuk untuk pembeli (opsional)</label>
-      <textarea class="in" data-f="note" maxlength="300">${esc(p.note)}</textarea>
-      <div class="err" data-f="err"></div>
-      <div class="actions"><button class="btn" data-save="${p.id}">Simpan ${esc(p.name)}</button></div>
-    </div>`).join('');
+  $('#chatSend').disabled = false;
 }
-$('#payGrid').addEventListener('change', async e => {
-  if (e.target.dataset.f !== 'image') return;
-  const box = e.target.closest('[data-pay]'), id = box.dataset.pay;
-  try {
-    payImg[id] = await fileToDataUrl(e.target.files[0], { max: 1000, type: 'image/png' });
-    const prev = $('[data-f=prev]', box); prev.src = payImg[id]; prev.hidden = false;
-  } catch (ex) { $('[data-f=err]', box).textContent = ex.message; }
-});
-$('#payGrid').addEventListener('click', e => {
-  const b = e.target.closest('[data-save]');
-  if (!b) return;
-  const id = b.dataset.save, box = b.closest('[data-pay]'), f = n => $(`[data-f=${n}]`, box);
-  const body = { enabled: f('enabled').checked, holder: f('holder').value, note: f('note').value };
-  if (f('number')) body.number = f('number').value;
-  if (payImg[id]) body.image = payImg[id];
-  guard(async () => {
-    try {
-      await api('/api/admin/payments/' + id, { method: 'PUT', admin: true, body });
-    } catch (ex) { if (ex.status === 401) throw ex; f('err').textContent = ex.message; return; }
-    delete payImg[id];
-    await load(); toast('Pembayaran disimpan');
-  });
-});
-
-/* ---------- laporan bug ---------- */
-function renderBugs() {
-  const n = D.bugs.filter(b => b.status === 'baru').length;
-  $('#bugBadge').hidden = !n; $('#bugBadge').textContent = n;
-  $('#bugList').innerHTML = D.bugs.length ? D.bugs.map(b => `
-    <div class="bug">
-      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="os">${tanggal(b.createdAt)}</span>
-        <span class="st ${b.status}">${b.status === 'baru' ? 'Baru' : 'Selesai'}</span></div>
-      <p>${esc(b.message)}</p>
-      ${b.image ? `<a href="${esc(b.image)}" target="_blank" rel="noopener"><img src="${esc(b.image)}" alt="Screenshot laporan"></a>` : ''}
-      ${b.contact ? `<dl class="kv"><dt>Kontak</dt><dd>${esc(b.contact)}</dd></dl>` : ''}
-      <div class="os" style="word-break:break-word;margin-top:4px">${esc(b.ua)}</div>
-      <div class="actions">
-        <button class="btn ${b.status === 'baru' ? 'ok' : 'ghost'} sm" data-bug-toggle="${b.id}">${b.status === 'baru' ? 'Tandai selesai' : 'Buka lagi'}</button>
-        <button class="btn bad sm" data-bug-del="${b.id}">Hapus</button></div>
-    </div>`).join('') : `<p class="hint" style="text-align:center;padding:32px 0">Belum ada laporan bug.</p>`;
-}
-$('#bugList').addEventListener('click', e => {
-  const t = e.target.closest('[data-bug-toggle]'), d = e.target.closest('[data-bug-del]');
-  if (t) guard(async () => {
-    const b = D.bugs.find(x => x.id === t.dataset.bugToggle);
-    await api('/api/admin/bugs/' + b.id, { method: 'PUT', admin: true, body: { status: b.status === 'baru' ? 'selesai' : 'baru' } });
-    await load();
-  });
-  if (d && confirm('Hapus laporan ini?')) guard(async () => {
-    await api('/api/admin/bugs/' + d.dataset.bugDel, { method: 'DELETE', admin: true });
-    await load(); toast('Laporan dihapus');
-  });
-});
-
-/* ---------- pengaturan ---------- */
-$('#sSave').onclick = () => guard(async () => {
-  $('#sErr').textContent = '';
-  try {
-    await api('/api/admin/settings', {
-      method: 'PUT', admin: true,
-      body: {
-        storeName: $('#sName').value,
-        socials: { instagram: $('#sIg').value, telegram: $('#sTg').value, whatsapp: $('#sWa').value }
-      }
-    });
-  } catch (e) { if (e.status === 401) throw e; $('#sErr').textContent = e.message; return; }
-  await load(); toast('Pengaturan disimpan');
-});
+$('#chatSend').onclick = sendChat;
+$('#chatInput').onkeydown = e => { if (e.key === 'Enter') sendChat(); };
 
 /* ---------- mulai ---------- */
-if (localStorage.getItem('adminToken')) start(); else showLogin();
+loadShop().finally(() => {
+  $('#pageLoader').classList.add('hide');
+  const h = location.hash.replace('#', '');
+  if (/^INV-[A-Z0-9]+$/.test(h)) openOrder(h);
+});
 </script>
 </body>
 </html>
