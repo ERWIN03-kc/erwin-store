@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#100C18">
+<title>Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="login" id="loginView" hidden>
+  <h1>Login admin</h1>
+  <p class="hint">Masukkan password admin untuk mengelola toko.</p>
+  <label class="f" for="pw">Password</label>
+  <input class="in" id="pw" type="password" autocomplete="current-password">
+  <div class="err" id="loginErr" role="alert"></div>
+  <button class="btn block" id="loginBtn">Masuk</button>
+</div>
+
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="wrap">
+      <span class="brand" id="aBrand">Admin</span>
+      <div style="display:flex;gap:8px">
+        <a class="btn ghost sm" href="/" target="_blank" rel="noopener">Lihat toko</a>
+        <button class="btn ghost sm" id="logout">Keluar</button>
+      </div>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Menu admin">
+    <button class="tab" role="tab" data-tab="orders" aria-selected="true">Pesanan <span class="badge" id="orderBadge" hidden>0</span></button>
+    <button class="tab" role="tab" data-tab="products" aria-selected="false">Produk</button>
+    <button class="tab" role="tab" data-tab="payments" aria-selected="false">Pembayaran</button>
+    <button class="tab" role="tab" data-tab="bugs" aria-selected="false">Laporan bug <span class="badge" id="bugBadge" hidden>0</span></button>
+    <button class="tab" role="tab" data-tab="settings" aria-selected="false">Pengaturan</button>
+  </nav>
+
+  <main class="wrap">
+    <!-- pesanan -->
+    <section class="panel" id="p-orders">
+      <div class="filters" id="filters"></div>
+      <div id="orderList"></div>
+    </section>
+
+    <!-- produk -->
+    <section class="panel" id="p-products" hidden>
+      <div class="box">
+        <h2 id="formTitle">Tambah produk</h2>
+        <label class="f" for="pName">Nama produk</label>
+        <input class="in" id="pName" maxlength="100">
+        <label class="f" for="pPrice">Harga (Rp)</label>
+        <input class="in" id="pPrice" inputmode="numeric" placeholder="25000">
+        <label class="f" for="pDesc">Deskripsi (opsional)</label>
+        <textarea class="in" id="pDesc" maxlength="500"></textarea>
+        <label class="f" for="pImage">Foto produk</label>
+        <input class="in" type="file" id="pImage" accept="image/*">
+        <img class="qr-prev" id="pPrev" alt="Pratinjau foto" hidden>
+        <div><button class="btn ghost sm" id="pRemoveImg" style="margin-top:8px" hidden>Hapus foto</button></div>
+        <label class="sw" style="margin-top:12px"><input type="checkbox" id="pActive" checked> Tampilkan di toko</label>
+        <div class="err" id="pErr"></div>
+        <div class="actions">
+          <button class="btn" id="pSave">Simpan produk</button>
+          <button class="btn ghost" id="pCancel" hidden>Batal edit</button>
+        </div>
+      </div>
+      <div class="box" id="productList"></div>
+    </section>
+
+    <!-- pembayaran -->
+    <section class="panel" id="p-payments" hidden>
+      <p class="hint" style="margin-bottom:12px">Atur metode pembayaran yang tampil ke pembeli. Minimal satu metode harus aktif.</p>
+      <div class="pgrid" id="payGrid"></div>
+    </section>
+
+    <!-- laporan bug -->
+    <section class="panel" id="p-bugs" hidden>
+      <div id="bugList"></div>
+    </section>
+
+    <!-- pengaturan -->
+    <section class="panel" id="p-settings" hidden>
+      <div class="box">
+        <h2>Nama toko</h2>
+        <input class="in" id="sName" maxlength="60">
+        <p class="hint" style="margin-top:6px">Tersimpan bersama tombol "Simpan pengaturan" di bawah.</p>
+      </div>
+      <div class="box">
+        <h2>Kontak &amp; sosial media</h2>
+        <p class="hint">Tampil di menu (garis 3) dan footer web pembeli. Kosongkan kalau tidak dipakai.</p>
+        <label class="f" for="sIg">Instagram (username)</label>
+        <input class="in" id="sIg" placeholder="erwinstore" maxlength="120" autocapitalize="off">
+        <label class="f" for="sTg">Telegram (username)</label>
+        <input class="in" id="sTg" placeholder="erwinstore" maxlength="120" autocapitalize="off">
+        <label class="f" for="sWa">WhatsApp (nomor)</label>
+        <input class="in" id="sWa" placeholder="081234567890" inputmode="tel" maxlength="30">
+        <div class="err" id="sErr"></div>
+        <div class="actions"><button class="btn" id="sSave">Simpan pengaturan</button></div>
+      </div>
+      <div class="box">
+        <h2>Password admin</h2>
+        <p class="hint">Password diatur lewat variabel <b>ADMIN_PASSWORD</b> saat server dijalankan. Ubah di sana, lalu restart server.</p>
+      </div>
+      <div class="box">
+        <h2>Chatbot tanya-jawab</h2>
+        <p class="hint">Widget chat di pojok kanan bawah web pembeli dijawab otomatis pakai AI Groq, berdasarkan daftar produk yang aktif. Aktifkan dengan mengisi variabel <b>GROQ_API_KEY</b> saat menjalankan server (ambil kunci gratis di console.groq.com), lalu restart server. Kalau belum diisi, chatbot akan menampilkan pesan bahwa fitur belum aktif.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="/common.js"></script>
+<script>
+let D = { settings: {}, products: [], payments: [], orders: [] };
+let filter = 'all', pollTimer = null, lastSnap = '';
+const openSet = new Set();
+
+/* ---------- login ---------- */
+function showLogin() {
+  clearInterval(pollTimer);
+  localStorage.removeItem('adminToken');
+  $('#app').hidden = true; $('#loginView').hidden = false;
+}
+async function start() {
+  try {
+    await load();
+    $('#loginView').hidden = true; $('#app').hidden = false;
+    clearInterval(pollTimer);
+    pollTimer = setInterval(poll, 10000);
+  } catch (e) { showLogin(); }
+}
+$('#loginBtn').onclick = async () => {
+  $('#loginErr').textContent = '';
+  try {
+    const { token } = await api('/api/admin/login', { method: 'POST', body: { password: $('#pw').value } });
+    localStorage.setItem('adminToken', token);
+    $('#pw').value = '';
+    start();
+  } catch (e) { $('#loginErr').textContent = e.message; }
+};
+$('#pw').onkeydown = e => { if (e.key === 'Enter') $('#loginBtn').click(); };
+$('#logout').onclick = showLogin;
+
+async function load() {
+  D = await api('/api/admin/data', { admin: true });
+  lastSnap = JSON.stringify([D.orders, D.bugs]);
+  $('#aBrand').textContent = D.settings.storeName;
+  document.title = 'Admin ' + D.settings.storeName;
+  $('#sName').value = D.settings.storeName;
+  const so = D.settings.socials || {};
+  $('#sIg').value = so.instagram || ''; $('#sTg').value = so.telegram || ''; $('#sWa').value = so.whatsapp || '';
+  renderOrders(); renderProducts(); renderPayments(); renderBugs();
+}
+async function poll() {
+  if (document.hidden) return;
+  const ae = document.activeElement;
+  if (ae && $('#p-orders').contains(ae) && /^(TEXTAREA|INPUT)$/.test(ae.tagName)) return; // jangan ganggu yang lagi ngetik
+  try {
+    const d = await api('/api/admin/data', { admin: true });
+    const snap = JSON.stringify([d.orders, d.bugs]);
+    if (snap !== lastSnap) { D.orders = d.orders; D.bugs = d.bugs; lastSnap = snap; renderOrders(); renderBugs(); }
+  } catch (e) { if (e.status === 401) showLogin(); }
+}
+async function guard(fn) {
+  try { await fn(); }
+  catch (e) { if (e.status === 401) showLogin(); else toast(e.message); }
+}
+
+/* ---------- tab ---------- */
+$$('.tab').forEach(t => t.onclick = () => {
+  $$('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  ['orders', 'products', 'payments', 'bugs', 'settings'].forEach(n => $('#p-' + n).hidden = n !== t.dataset.tab);
+});
+
+/* ---------- pesanan ---------- */
+const LABEL = { menunggu_bukti: 'Belum bayar', menunggu_konfirmasi: 'Perlu dicek', ditolak: 'Ditolak', dibayar: 'Lunas, tunggu data', data_terisi: 'Perlu dikirim', selesai: 'Selesai' };
+const GROUPS = {
+  all: () => true,
+  cek: o => o.status === 'menunggu_konfirmasi',
+  kirim: o => ['dibayar', 'data_terisi'].includes(o.status),
+  selesai: o => o.status === 'selesai',
+  lain: o => ['menunggu_bukti', 'ditolak'].includes(o.status)
+};
+const GROUP_NAME = { all: 'Semua', cek: 'Perlu dicek', kirim: 'Perlu dikirim', selesai: 'Selesai', lain: 'Belum bayar / ditolak' };
+
+function waLink(phone) {
+  let n = String(phone).replace(/\D/g, '');
+  if (n.startsWith('0')) n = '62' + n.slice(1);
+  return 'https://wa.me/' + n;
+}
+
+function orderHtml(o) {
+  const d = o.details;
+  return `<details class="order" data-code="${o.code}" ${openSet.has(o.code) ? 'open' : ''}>
+    <summary>
+      <div><div class="ot">${esc(o.product.name)} &middot; ${rupiah(o.product.price)}</div>
+        <div class="os">${o.code} &middot; ${esc(o.payment.name)} &middot; ${tanggal(o.createdAt)}</div></div>
+      <span class="st ${o.status}">${LABEL[o.status]}</span>
+    </summary>
+    <div class="od">
+      ${o.proof ? `<h4>Bukti transfer</h4><a href="${esc(o.proof)}" target="_blank" rel="noopener"><img class="proof" src="${esc(o.proof)}" alt="Bukti transfer"></a>` : ''}
+      ${o.status === 'ditolak' ? `<div class="alert bad" style="margin-top:12px">Alasan penolakan: ${esc(o.rejectReason)}</div>` : ''}
+      ${d ? `<h4>Data pembeli</h4><dl class="kv">
+        <dt>Nama</dt><dd>${esc(d.name)}</dd>
+        <dt>Barang</dt><dd>${esc(d.item)}</dd>
+        <dt>No. HP</dt><dd>${esc(d.phone)} (<a href="${esc(waLink(d.phone))}" target="_blank" rel="noopener">chat WhatsApp</a>)</dd>
+        <dt>Email</dt><dd><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></dd>
+        ${d.note ? `<dt>Catatan</dt><dd>${esc(d.note)}</dd>` : ''}</dl>` : ''}
+      ${o.status === 'menunggu_konfirmasi' ? `<div class="actions">
+        <button class="btn ok" data-act="approve" data-code="${o.code}">ACC pembayaran</button>
+        <button class="btn bad" data-act="reject" data-code="${o.code}">Tolak</button></div>` : ''}
+      ${['dibayar', 'data_terisi'].includes(o.status) ? `
+        <h4>Kirim pesanan ke pembeli</h4>
+        <textarea class="in" id="msg-${o.code}" rows="4" placeholder="Isi pesanan: kode, link download, akun, atau keterangan lain"></textarea>
+        <div class="actions"><button class="btn" data-act="deliver" data-code="${o.code}">Kirim pesanan</button></div>` : ''}
+      ${o.status === 'selesai' && o.delivery ? `<h4>Pesan yang dikirim (${tanggal(o.delivery.at)})</h4><div class="delivery">${linkify(o.delivery.message)}</div>` : ''}
+    </div></details>`;
+}
+
+function renderOrders() {
+  const count = k => D.orders.filter(GROUPS[k]).length;
+  $('#filters').innerHTML = Object.keys(GROUPS).map(k =>
+    `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${GROUP_NAME[k]} (${count(k)})</button>`).join('');
+  const list = D.orders.filter(GROUPS[filter]);
+  $('#orderList').innerHTML = list.length ? list.map(orderHtml).join('') : `<p class="hint" style="text-align:center;padding:32px 0">Belum ada pesanan di kategori ini.</p>`;
+  const need = count('cek');
+  $('#orderBadge').hidden = !need;
+  $('#orderBadge').textContent = need;
+}
+$('#filters').addEventListener('click', e => {
+  const c = e.target.closest('[data-f]');
+  if (c) { filter = c.dataset.f; renderOrders(); }
+});
+$('#orderList').addEventListener('toggle', e => {
+  const code = e.target.dataset && e.target.dataset.code;
+  if (!code) return;
+  e.target.open ? openSet.add(code) : openSet.delete(code);
+}, true);
+$('#orderList').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const { act, code } = b.dataset;
+  const run = (path, body) => guard(async () => {
+    await api(`/api/admin/orders/${code}/${path}`, { method: 'POST', admin: true, body: body || {} });
+    await load(); toast('Berhasil');
+  });
+  if (act === 'approve') { if (confirm('Pastikan dana sudah masuk. ACC pembayaran ini?')) run('approve'); }
+  if (act === 'reject') { const r = prompt('Alasan penolakan (opsional):'); if (r !== null) run('reject', { reason: r }); }
+  if (act === 'deliver') {
+    const t = document.getElementById('msg-' + code).value.trim();
+    if (!t) return toast('Isi pesan pengiriman dulu');
+    run('deliver', { message: t });
+  }
+});
+
+/* ---------- produk ---------- */
+let editingId = null, pImg = null, pRemove = false;
+const thumb = (img, name) => img ? `<img src="${esc(img)}" alt="">` : `<span class="ph" style="font-size:1.4rem">${esc((name || '?').charAt(0).toUpperCase())}</span>`;
+
+function resetForm() {
+  editingId = null; pImg = null; pRemove = false;
+  $('#formTitle').textContent = 'Tambah produk';
+  ['pName', 'pPrice', 'pDesc'].forEach(i => $('#' + i).value = '');
+  $('#pImage').value = ''; $('#pPrev').hidden = true; $('#pRemoveImg').hidden = true;
+  $('#pActive').checked = true; $('#pCancel').hidden = true; $('#pErr').textContent = '';
+}
+$('#pImage').onchange = async () => {
+  try {
+    pImg = await fileToDataUrl($('#pImage').files[0], { max: 1000 });
+    pRemove = false;
+    $('#pPrev').src = pImg; $('#pPrev').hidden = false; $('#pRemoveImg').hidden = false;
+  } catch (e) { $('#pErr').textContent = e.message; }
+};
+$('#pRemoveImg').onclick = () => { pImg = null; pRemove = true; $('#pImage').value = ''; $('#pPrev').hidden = true; $('#pRemoveImg').hidden = true; };
+$('#pCancel').onclick = resetForm;
+$('#pSave').onclick = () => guard(async () => {
+  $('#pErr').textContent = '';
+  const body = {
+    name: $('#pName').value, price: Number($('#pPrice').value.replace(/\D/g, '')),
+    description: $('#pDesc').value, active: $('#pActive').checked
+  };
+  if (pImg) body.image = pImg;
+  if (pRemove) body.removeImage = true;
+  try {
+    await api(editingId ? '/api/admin/products/' + editingId : '/api/admin/products', { method: editingId ? 'PUT' : 'POST', admin: true, body });
+  } catch (e) { if (e.status === 401) throw e; $('#pErr').textContent = e.message; return; }
+  resetForm(); await load(); toast('Produk disimpan');
+});
+
+function renderProducts() {
+  $('#productList').innerHTML = `<h2>Daftar produk (${D.products.length})</h2>` + (D.products.length ? D.products.map(p => `
+    <div class="prow">
+      <div class="thumb">${thumb(p.image, p.name)}</div>
+      <div class="grow"><b>${esc(p.name)}</b><span class="os">${rupiah(p.price)}</span></div>
+      <label class="sw"><input type="checkbox" data-toggle="${p.id}" ${p.active ? 'checked' : ''}>Tampil</label>
+      <button class="btn ghost sm" data-edit="${p.id}">Edit</button>
+      <button class="btn bad sm" data-del="${p.id}">Hapus</button>
+    </div>`).join('') : `<p class="hint">Belum ada produk.</p>`);
+}
+$('#productList').addEventListener('change', e => {
+  const id = e.target.dataset.toggle;
+  if (id) guard(async () => { await api('/api/admin/products/' + id, { method: 'PUT', admin: true, body: { active: e.target.checked } }); await load(); });
+});
+$('#productList').addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
+  if (ed) {
+    const p = D.products.find(x => x.id === ed.dataset.edit);
+    resetForm(); editingId = p.id;
+    $('#formTitle').textContent = 'Edit produk';
+    $('#pName').value = p.name; $('#pPrice').value = p.price; $('#pDesc').value = p.description || '';
+    $('#pActive').checked = p.active; $('#pCancel').hidden = false;
+    if (p.image) { $('#pPrev').src = p.image; $('#pPrev').hidden = false; $('#pRemoveImg').hidden = false; }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (del) {
+    const p = D.products.find(x => x.id === del.dataset.del);
+    if (confirm(`Hapus produk "${p.name}"? Pesanan lama tetap tersimpan.`)) guard(async () => {
+      await api('/api/admin/products/' + p.id, { method: 'DELETE', admin: true });
+      if (editingId === p.id) resetForm();
+      await load(); toast('Produk dihapus');
+    });
+  }
+});
+
+/* ---------- pembayaran ---------- */
+const payImg = {}, payRemove = {};
+function renderPayments() {
+  $('#payGrid').innerHTML = D.payments.map(p => `
+    <div class="box" data-pay="${p.id}">
+      <h2>${esc(p.name)}</h2>
+      <label class="sw"><input type="checkbox" data-f="enabled" ${p.enabled ? 'checked' : ''}> Aktif</label>
+      <label class="f">Atas nama</label>
+      <input class="in" data-f="holder" value="${esc(p.holder)}" maxlength="80">
+      ${p.id !== 'qris' ? `<label class="f">Nomor ${esc(p.name)}</label>
+      <input class="in" data-f="number" value="${esc(p.number)}" inputmode="tel" maxlength="40">` : ''}
+      <label class="f">${p.id === 'qris' ? 'Gambar QRIS' : 'Gambar QR (opsional)'}</label>
+      <input class="in" type="file" data-f="image" accept="image/*">
+      <img class="qr-prev" data-f="prev" ${p.image ? `src="${esc(p.image)}"` : 'hidden'} alt="QR ${esc(p.name)}">
+      <label class="f">Petunjuk untuk pembeli (opsional)</label>
+      <textarea class="in" data-f="note" maxlength="300">${esc(p.note)}</textarea>
+      <div class="err" data-f="err"></div>
+      <div class="actions"><button class="btn" data-save="${p.id}">Simpan ${esc(p.name)}</button></div>
+    </div>`).join('');
+}
+$('#payGrid').addEventListener('change', async e => {
+  if (e.target.dataset.f !== 'image') return;
+  const box = e.target.closest('[data-pay]'), id = box.dataset.pay;
+  try {
+    payImg[id] = await fileToDataUrl(e.target.files[0], { max: 1000, type: 'image/png' });
+    const prev = $('[data-f=prev]', box); prev.src = payImg[id]; prev.hidden = false;
+  } catch (ex) { $('[data-f=err]', box).textContent = ex.message; }
+});
+$('#payGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-save]');
+  if (!b) return;
+  const id = b.dataset.save, box = b.closest('[data-pay]'), f = n => $(`[data-f=${n}]`, box);
+  const body = { enabled: f('enabled').checked, holder: f('holder').value, note: f('note').value };
+  if (f('number')) body.number = f('number').value;
+  if (payImg[id]) body.image = payImg[id];
+  guard(async () => {
+    try {
+      await api('/api/admin/payments/' + id, { method: 'PUT', admin: true, body });
+    } catch (ex) { if (ex.status === 401) throw ex; f('err').textContent = ex.message; return; }
+    delete payImg[id];
+    await load(); toast('Pembayaran disimpan');
+  });
+});
+
+/* ---------- laporan bug ---------- */
+function renderBugs() {
+  const n = D.bugs.filter(b => b.status === 'baru').length;
+  $('#bugBadge').hidden = !n; $('#bugBadge').textContent = n;
+  $('#bugList').innerHTML = D.bugs.length ? D.bugs.map(b => `
+    <div class="bug">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="os">${tanggal(b.createdAt)}</span>
+        <span class="st ${b.status}">${b.status === 'baru' ? 'Baru' : 'Selesai'}</span></div>
+      <p>${esc(b.message)}</p>
+      ${b.image ? `<a href="${esc(b.image)}" target="_blank" rel="noopener"><img src="${esc(b.image)}" alt="Screenshot laporan"></a>` : ''}
+      ${b.contact ? `<dl class="kv"><dt>Kontak</dt><dd>${esc(b.contact)}</dd></dl>` : ''}
+      <div class="os" style="word-break:break-word;margin-top:4px">${esc(b.ua)}</div>
+      <div class="actions">
+        <button class="btn ${b.status === 'baru' ? 'ok' : 'ghost'} sm" data-bug-toggle="${b.id}">${b.status === 'baru' ? 'Tandai selesai' : 'Buka lagi'}</button>
+        <button class="btn bad sm" data-bug-del="${b.id}">Hapus</button></div>
+    </div>`).join('') : `<p class="hint" style="text-align:center;padding:32px 0">Belum ada laporan bug.</p>`;
+}
+$('#bugList').addEventListener('click', e => {
+  const t = e.target.closest('[data-bug-toggle]'), d = e.target.closest('[data-bug-del]');
+  if (t) guard(async () => {
+    const b = D.bugs.find(x => x.id === t.dataset.bugToggle);
+    await api('/api/admin/bugs/' + b.id, { method: 'PUT', admin: true, body: { status: b.status === 'baru' ? 'selesai' : 'baru' } });
+    await load();
+  });
+  if (d && confirm('Hapus laporan ini?')) guard(async () => {
+    await api('/api/admin/bugs/' + d.dataset.bugDel, { method: 'DELETE', admin: true });
+    await load(); toast('Laporan dihapus');
+  });
+});
+
+/* ---------- pengaturan ---------- */
+$('#sSave').onclick = () => guard(async () => {
+  $('#sErr').textContent = '';
+  try {
+    await api('/api/admin/settings', {
+      method: 'PUT', admin: true,
+      body: {
+        storeName: $('#sName').value,
+        socials: { instagram: $('#sIg').value, telegram: $('#sTg').value, whatsapp: $('#sWa').value }
+      }
+    });
+  } catch (e) { if (e.status === 401) throw e; $('#sErr').textContent = e.message; return; }
+  await load(); toast('Pengaturan disimpan');
+});
+
+/* ---------- mulai ---------- */
+if (localStorage.getItem('adminToken')) start(); else showLogin();
+</script>
+</body>
+</html>
